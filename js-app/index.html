@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plurality Network Demo</title>
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@plurality-network/smart-profile-wallet-preview@2.14.6/dist/index.umd.js"></script>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: right;
+            padding: 20px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #f0f0f0;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header" id="loginContainer">
+            <!-- Plurality Social Connect will be initialized here -->
+        </div>
+        
+        <div class="content hidden" id="mainContent">
+            <div class="section">
+                <h1>Wallet SDK Functions</h1>
+                <button onclick="getAllAccounts()">Get All Accounts</button>
+                <button onclick="getConnectedAccount()">Get Connected Account</button>
+                <button onclick="getMessageSignature()">Sign Message</button>
+                <button onclick="getVerifyMessageData()">Verify Message</button>
+                <button onclick="getBalanceData()">Get Balance</button>
+                <button onclick="sendTransactionData()">Send Transaction</button>
+                <button onclick="fetchTransactionCount()">Get Transaction Count</button>
+                <button onclick="readFromContractData()">Read Contract</button>
+                <button onclick="writeToContractData()">Write Contract</button>
+            </div>
+
+            <div class="section">
+                <h1>Profile SDK Functions</h1>
+                <button onclick="storePublicData()">Set Public Metadata</button>
+                <button onclick="loadPublicData()">Get Public Metadata</button>
+                <button onclick="storePrivateData()">Set Private Metadata</button>
+                <button onclick="loadPrivateData()">Get Private Metadata</button>
+                <button onclick="fetchLoginInfo()">Get Login Info</button>
+                <button onclick="updateConsent()">Update Consent</button>
+                <button onclick="fetchSmartProfileData()">Get Smart Profile Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        // Check if SDK is in window object
+        console.log('Window SDK:', window.PluralitySocialConnect);
+
+        // Check SDK prototype
+        console.log('SDK prototype:', Object.getPrototypeOf(PluralitySocialConnect));
+
+        // List all properties
+        console.log('SDK properties:', Object.getOwnPropertyNames(PluralitySocialConnect));
+
+        console.log(PluralitySocialConnect);
+
+        // First check if the SDK is loaded properly
+        if (typeof PluralitySocialConnect === 'undefined') {
+            console.error('Plurality SDK not loaded. Please check the SDK import.');
+            alert('Plurality SDK not loaded. Please check the console for more details.');
+        }
+
+        // Configuration
+        const options = { 
+            clientId: '', // Add your client ID here
+            theme: 'light', 
+            text: 'Login' 
+        };
+
+        const abi = '[{"inputs":[],"name":"retrieve","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"num","type":"uint256"}],"name":"store","outputs":[],"stateMutability":"nonpayable","type":"function"}]';
+        
+        const rawTx = JSON.stringify({
+            to: "0xe613B4cd69Fe20E8bd0F0D79a264210886bA1AA2",
+            value: "10000000000000000",
+            gasLimit: "21000",
+            gasPrice: "50000000000",
+        });
+
+        const txParams = JSON.stringify([8]);
+        const txOptions = JSON.stringify({ gasLimit: 2000000 });
+
+        function handleDataReturned(data) {
+            try {
+                const receivedData = JSON.parse(JSON.stringify(data));
+                console.log("Login info callback data:", receivedData);
+                document.getElementById('mainContent').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error handling login data:', error);
+            }
+        }
+
+        // Wallet Functions
+        async function getAllAccounts() {
+            try {
+                const response = await PluralitySocialConnect.getAllAccounts();
+                if (response) {
+                    alert(`All Accounts: ${response.data[0]?.address}`);
+                }
+            } catch (error) {
+                console.error('Error getting accounts:', error);
+                alert('Failed to get accounts');
+            }
+        }
+
+        async function getConnectedAccount() {
+            try {
+                const response = await PluralitySocialConnect.getConnectedAccount();
+                if (response) {
+                    alert(`Connected Account: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error getting connected account:', error);
+                alert('Failed to get connected account');
+            }
+        }
+
+        async function getMessageSignature() {
+            try {
+                const message = "Example `personal_sign` message.";
+                const response = await PluralitySocialConnect.getMessageSignature(message);
+                if (response) {
+                    alert(`Sign Message Data: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error signing message:', error);
+                alert('Failed to sign message');
+            }
+        }
+
+        async function getVerifyMessageData() {
+            try {
+                const message = "Example `personal_sign` message.";
+                const key = "0x8e2eeb0a7fe472bcd9751e2a8f27b60050c98a3140c07679bd1a00082de1fce86c9dbaad511503e1c4b2e9f57f7ddf971865eb9f177387879417ef0776c02cf41b";
+                const response = await PluralitySocialConnect.verifyMessageSignature(message, key);
+                if (response) {
+                    alert(`Verification Signature Data: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error verifying message:', error);
+                alert('Failed to verify message');
+            }
+        }
+
+        // Profile Functions
+        async function storePublicData() {
+            try {
+                const response = await PluralitySocialConnect.setPublicData("name", "plural-abc");
+                if (response) {
+                    alert(response.data);
+                }
+            } catch (error) {
+                console.error('Error storing public data:', error);
+                alert('Failed to store public data');
+            }
+        }
+
+        async function loadPublicData() {
+            try {
+                const response = await PluralitySocialConnect.getPublicData("name");
+                if (response) {
+                    alert(response.data);
+                }
+            } catch (error) {
+                console.error('Error loading public data:', error);
+                alert('Failed to load public data');
+            }
+        }
+
+        async function storePrivateData() {
+            try {
+                const response = await PluralitySocialConnect.setPrivateData("work", "Plurality");
+                if (response) {
+                    alert(response.data);
+                }
+            } catch (error) {
+                console.error('Error storing private data:', error);
+                alert('Failed to store private data');
+            }
+        }
+
+        async function loadPrivateData() {
+            try {
+                const response = await PluralitySocialConnect.getPrivateData("work");
+                if (response) {
+                    alert(response.data);
+                }
+            } catch (error) {
+                console.error('Error loading private data:', error);
+                alert('Failed to load private data');
+            }
+        }
+
+        // Blockchain Functions
+        async function getBalanceData() {
+            try {
+                const response = await PluralitySocialConnect.getBalance(
+                    "https://ethereum-sepolia.rpc.subquery.network/public",
+                    "11155111"
+                );
+                if (response) {
+                    alert(`Balance: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error getting balance:', error);
+                alert('Failed to get balance');
+            }
+        }
+
+        async function sendTransactionData() {
+            try {
+                const response = await PluralitySocialConnect.sendTransaction(
+                    rawTx,
+                    "https://ethereum-sepolia.rpc.subquery.network/public",
+                    "11155111"
+                );
+                if (response) {
+                    alert(`Transaction sent: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error sending transaction:', error);
+                alert('Failed to send transaction');
+            }
+        }
+
+        async function fetchSmartProfileData() {
+            try {
+                const response = await PluralitySocialConnect.getSmartProfileData();
+                if (response) {
+                    alert(`Smart Profile Data: ${JSON.stringify(response.data)}`);
+                }
+            } catch (error) {
+                console.error('Error fetching smart profile data:', error);
+                alert('Failed to fetch smart profile data');
+            }
+        }
+
+        // Add missing functions from the original code
+        async function fetchTransactionCount() {
+            try {
+                const response = await PluralitySocialConnect.getTransactionCount(
+                    "0xe613B4cd69Fe20E8bd0F0D79a264210886bA1AA2",
+                    "https://ethereum-sepolia.rpc.subquery.network/public",
+                    "11155111"
+                );
+                if (response) {
+                    alert(`Transaction Count: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error fetching transaction count:', error);
+                alert('Failed to fetch transaction count');
+            }
+        }
+
+        async function readFromContractData() {
+            try {
+                const response = await PluralitySocialConnect.readFromContract(
+                    "0x8E26aa0b6c7A396C92237C6a87cCD6271F67f937",
+                    abi,
+                    "retrieve",
+                    "",
+                    "https://ethereum-sepolia.rpc.subquery.network/public",
+                    "11155111"
+                );
+                if (response) {
+                    alert(`Read From Contract Data: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error reading from contract:', error);
+                alert('Failed to read from contract');
+            }
+        }
+
+        async function writeToContractData() {
+            try {
+                const response = await PluralitySocialConnect.writeToContract(
+                    "0x8E26aa0b6c7A396C92237C6a87cCD6271F67f937",
+                    abi,
+                    "store",
+                    txParams,
+                    "https://ethereum-sepolia.rpc.subquery.network/public",
+                    "11155111",
+                    txOptions
+                );
+                if (response) {
+                    alert(`Write To Contract: ${response.data}`);
+                }
+            } catch (error) {
+                console.error('Error writing to contract:', error);
+                alert('Failed to write to contract');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.PluralitySocialConnect) {
+                const root = ReactDOM.createRoot(document.getElementById('loginContainer'));
+                root.render(
+                    React.createElement(PluralitySocialConnect, {
+                        options: options,
+                        onDataReturned: handleDataReturned
+                    })
+                );
+            } else {
+                console.error("PluralitySocialConnect is not available");
+            }
+        });
+
+    </script>
+</body>
+</html>
