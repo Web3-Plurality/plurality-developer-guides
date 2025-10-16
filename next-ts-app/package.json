@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@plurality-network/smart-profile-wallet": "^3",
+    "@plurality-network/smart-profile-wallet": "^4",
     "antd": "^5.23.4",
     "dotenv": "^16.4.7",
     "ethers": "^6.13.5",

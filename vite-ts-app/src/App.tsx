@@ -17,7 +17,7 @@ const App = () => {
     const [isLogin, setLogin] = useState(false);
 
     // options for the embedded profiles wallet
-    const options = { clientId: '6ea8bf02-ea37-403f-b74c-f117fd3bc0a1', theme: 'light', text: 'Login' };
+    const options = { clientId: '', theme: 'light', text: 'Login' };
     
     const abi = '[{"inputs":[],"name":"retrieve","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"num","type":"uint256"}],"name":"store","outputs":[],"stateMutability":"nonpayable","type":"function"}]';
     const rawTx = JSON.stringify({

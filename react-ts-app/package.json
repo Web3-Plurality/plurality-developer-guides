@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@plurality-network/smart-profile-wallet": "^3",
+    "@plurality-network/smart-profile-wallet": "^4",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "react": "^18.2.0",

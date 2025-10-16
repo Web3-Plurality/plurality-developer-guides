@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@plurality-network/smart-profile-wallet": "^3",
+    "@plurality-network/smart-profile-wallet": "^4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
